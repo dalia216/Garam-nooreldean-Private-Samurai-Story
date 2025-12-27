@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Garam nooreldean | Private Samurai Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@1,500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --gold: #ffcc33;
+            --sakura: #ffb7c5;
+            --neon-pink: #ff2d70; /* لون مطابق لطلبك الأصلي */
+            --dark: #0a0212;
+            --glass: rgba(255, 255, 255, 0.07);
+        }
+
+        /* خاصية الزاوية المتحركة للبرواز */
+        @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--dark);
+            background-image: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #050110 100%);
+            color: white; font-family: 'Fredoka', sans-serif;
+            min-height: 100vh; width: 100vw; overflow-x: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #sakura-container { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+        /* --- تصميم اللوجين المطور (Theme Match) --- */
+        .box {
+            position: relative; width: 320px; height: 420px;
+            /* البرواز بلون الوردي النيوني الخاص بك */
+            background: repeating-conic-gradient(from var(--a), var(--neon-pink) 0%, var(--neon-pink) 5%, transparent 5%, transparent 40%, var(--neon-pink) 50%);
+            filter: drop-shadow(0 0 30px rgba(255, 45, 112, 0.3));
+            border-radius: 20px; animation: rotating 4s linear infinite;
+            display: flex; justify-content: center; align-items: center; z-index: 100;
+            transition: 0.5s;
+        }
+        @keyframes rotating { 0% { --a: 0deg; } 100% { --a: 360deg; } }
+        
+        /* البرواز الثاني بلون الذهبي */
+        .box::before {
+            content: ""; position: absolute; width: 100%; height: 100%;
+            background: repeating-conic-gradient(from var(--a), var(--gold) 0%, var(--gold) 5%, transparent 5%, transparent 40%, var(--gold) 50%);
+            border-radius: 20px; animation: rotating 4s linear infinite; animation-delay: -1s;
+        }
+        
+        .box::after { 
+            content: ""; position: absolute; inset: 6px; 
+            background: #11081a; border-radius: 15px; 
+            border: 2px solid #25252b; 
+        }
+
+        .login { position: absolute; inset: 15px; display: flex; justify-content: center; align-items: center; flex-direction: column; border-radius: 10px; background: rgba(0,0,0,0.3); color: #fff; z-index: 1000; box-shadow: inset 0 10px 20px #00000080; overflow: hidden; }
+        .loginBx { position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 20px; width: 85%; }
+        
+        .loginBx h2 { text-transform: uppercase; font-weight: 600; letter-spacing: 0.15em; font-family: 'Poppins', sans-serif; font-size: 1.1rem; color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+        .loginBx h2 i { color: var(--neon-pink); }
+
+        .loginBx input { width: 100%; padding: 12px 20px; outline: none; border: 2px solid var(--gold); font-size: 0.9em; color: #fff; background: rgba(0,0,0,0.4); border-radius: 30px; font-family: 'Poppins', sans-serif; transition: 0.3s; }
+        .loginBx input:focus { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+        
+        .loginBx input[type="button"] { 
+            background: linear-gradient(135deg, var(--gold), #b8860b); 
+            border: none; font-weight: 700; color: #000; cursor: pointer; 
+        }
+
+        /* --- Main App Wrapper --- */
+        .app-wrapper {
+            width: 95%; max-width: 420px; z-index: 10;
+            backdrop-filter: blur(20px); background: var(--glass);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 40px; padding: 30px;
+            box-shadow: 0 0 50px rgba(255, 45, 117, 0.2);
+            text-align: center; position: relative;
+            display: none;
+        }
+
+        .section { display: none; flex-direction: column; align-items: center; animation: slideUp 0.8s ease; }
+        .active { display: flex; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loading 120% */
+        .pct-display { font-size: 4rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 20px var(--gold); }
+        .progress-rail { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--neon-pink), var(--gold)); transition: width 3s linear; }
+
+        .avatar-frame { width: 130px; height: 130px; border-radius: 50%; padding: 10px; border: 2px solid var(--gold); margin-bottom: 25px; overflow: hidden; }
+        .avatar-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.4rem; color: var(--gold); margin-bottom: 10px; }
+        .days-hero { font-size: 6rem; font-weight: 700; color: white; margin: 15px 0; }
+        .btn-samurai { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; border: none; border-radius: 50px; padding: 16px 45px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+
+        /* Game & Love Section */
+        .game-canvas { width: 100%; height: 280px; background: rgba(0,0,0,0.3); border: 1.5px solid var(--gold); border-radius: 25px; position: relative; overflow: hidden; margin: 20px 0; }
+        .shiny-heart { position: absolute; font-size: 38px; cursor: pointer; filter: drop-shadow(0 0 12px var(--neon-pink)); }
+        
+        .love-area { position: relative; width: 100%; height: 180px; margin-top: 20px; }
+        .love-btn { position: absolute; border: none; border-radius: 50px; width: 110px; height: 48px; font-weight: bold; cursor: pointer; background-color: var(--neon-pink); color: white; box-shadow: 0 4px 15px rgba(255, 45, 117, 0.4); font-size: 1.1rem; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .yes-btn { left: 10%; top: 30%; }
+        .no-btn-move { right: 10%; top: 30%; transition: left 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.2s; }
+        
+        /* لودر القلب */
+        .heart-loader { 
+            display: none; margin: 50px auto; width: 30px; height: 30px; background-color: var(--neon-pink); 
+            transform: rotate(-45deg); animation: h-pulse 1.5s infinite; position: relative;
+        }
+        .heart-loader::before, .heart-loader::after { content: ""; position: absolute; width: 30px; height: 30px; background-color: var(--neon-pink); border-radius: 50%; }
+        .heart-loader::before { top: -15px; left: 0; } .heart-loader::after { top: 0; left: 15px; }
+        @keyframes h-pulse { 0%, 100% { transform: rotate(-45deg) scale(1); } 50% { transform: rotate(-45deg) scale(1.3); } }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(5, 1, 16, 0.98); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 25px; }
+        .typewriter-text { font-family: 'Playfair Display', serif; line-height: 1.8; color: #f0f0f0; text-align: center; font-style: italic; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div id="sakura-container"></div>
+    <audio id="bg-music" loop><source src="Cairokee - Samurai كايروكي - ساموراي.mp3" type="audio/mp3"></audio>
+
+    <div class="box" id="login-screen">
+        <div class="login">
+            <div class="loginBx">
+                <h2><i class="fa-solid fa-lock"></i> private place <i class="fa-solid fa-heart"></i></h2>
+                <input type="text" id="username" placeholder="Your Name...">
+                <input type="password" id="password" placeholder="Secret Code...">
+                <input type="button" value="Enter your world" onclick="checkLogin()">
+                <p id="error-msg" style="color: var(--gold); font-size: 0.7rem; display: none; margin-top: 5px;">Access Denied, Samurai!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-wrapper" id="main-wrapper">
+        <div id="s1" class="section">
+            <div style="font-size: 60px; margin-bottom: 10px;">💖</div>
+            <div class="pct-display"><span id="pct">0</span>%</div>
+            <div class="progress-rail"><div id="bar" class="progress-bar"></div></div>
+            <p style="color: var(--sakura); letter-spacing: 2px; font-size: 0.8rem;">LOADING OVERFLOWING LOVE</p>
+        </div>
+
+        <div id="s2" class="section">
+            <div class="avatar-frame"><img src="samurai-japan.gif"></div>
+            <h1>The Samurai's Heart</h1>
+            <button class="btn-samurai" onclick="startJourney()">Enter Now ⚔️</button>
+        </div>
+
+        <div id="s3" class="section">
+            <div class="avatar-frame" style="width: 100px; height: 100px;"><img src="samurai-japan.gif"></div>
+            <h1>Days of Victory</h1>
+            <div class="days-hero" id="days">0</div>
+            <button id="btn-s3" class="btn-samurai" style="display:none" onclick="showS('s4')">Unlock Wishes ✨</button>
+        </div>
+
+        <div id="s4" class="section">
+            <h1>Catch the hearts</h1>
+            <p>Score: <span id="score">0</span>/8</p>
+            <div class="game-canvas" id="game-box"></div>
+            <button class="btn-samurai" id="st-game" onclick="runGame()">Start Mission</button>
+            <button class="btn-samurai" id="btn-s4" style="display:none" onclick="showS('s5')">View Memories 📸</button>
+        </div>
+
+        <div id="s5" class="section">
+            <h1>Our Best Moments</h1>
+            <div style="width: 270px; height: 350px; border: 8px solid white; border-bottom: 45px solid white; box-shadow: 0 15px 40px rgba(0,0,0,0.5); transform: rotate(-2deg); overflow: hidden; cursor: pointer;" onclick="nextImg()">
+                <img src="photo_7_2025-12-27_20-08-15.jpg" id="gal-img" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <button class="btn-samurai" style="margin-top: 35px;" onclick="openLetter()">Final Message 💌</button>
+        </div>
+
+        <div id="s6" class="section">
+            <div class="tenor-gif-embed" data-postid="25789758" data-share-method="host" data-width="100%" style="height: 180px; overflow: hidden; border-radius: 20px;"><a href="https://tenor.com/view/tkthao219-bubududu-gif-25789758">Gif</a></div>
+            <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+            <div class="love-area" id="love-boundary">
+                <button class="love-btn yes-btn" onclick="handleYes()">Yes</button>
+                <button class="love-btn no-btn-move" id="no-btn">No</button>
+            </div>
+            <div class="heart-loader" id="love-l"></div>
+            <div id="love-res" style="display:none; width: 100%;">
+                <video style="width: 100%; border-radius: 20px;" src="cute love gif.mp4" id="v-res" loop muted playsinline></video>
+                <h1 style="margin-top: 15px;">I knew it 😍!</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="letter-modal">
+        <div class="app-wrapper" style="display:block; max-width: 380px; border-color: var(--neon-pink);">
+            <h1 style="color: var(--neon-pink);">Happy 2026 ❤️</h1>
+            <div class="typewriter-text" id="typewriter"></div>
+            <button class="btn-samurai" id="final-btn" style="display:none; width: 100%; margin-top: 25px;" onclick="goToLovePage()">Answer My Question 💖</button>
+        </div>
+    </div>
+
+    <script>
+        // التحقق من الدخول (بياناتك المحددة)
+        function checkLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if(user === "garam nooreldean" && pass === "#2162025NG") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-wrapper').style.display = 'block';
+                startLoading();
+                document.getElementById('bg-music').play();
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        // الساكورا
+        function createPetal() {
+            const p = document.createElement('div');
+            p.style.position = 'absolute'; p.style.width = '10px'; p.style.height = '10px';
+            p.style.background = 'var(--sakura)'; p.style.borderRadius = '100% 0 100% 0';
+            p.style.left = Math.random() * 100 + 'vw'; p.style.top = '-20px';
+            document.getElementById('sakura-container').appendChild(p);
+            p.animate([{ transform: 'translate(0, 0)' }, { transform: `translate(${Math.random()*100-50}px, 100vh) rotate(720deg)` }], { duration: 6000 });
+            setTimeout(() => p.remove(), 6000);
+        }
+        setInterval(createPetal, 450);
+
+        function showS(id) { document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        
+        function startLoading() {
+            showS('s1');
+            let p=0; let pInt=setInterval(()=>{ 
+                p++; document.getElementById('pct').innerText=p; 
+                document.getElementById('bar').style.width=(p/1.2)+"%"; 
+                if(p>=120){ clearInterval(pInt); setTimeout(()=>showS('s2'), 800); } 
+            }, 30);
+        }
+
+        function startJourney() { 
+            showS('s3'); 
+            let c=0; let i=setInterval(()=>{ 
+                c+=2; if(c>=194){ c=194; clearInterval(i); document.getElementById('btn-s3').style.display='block'; confetti(); } 
+                document.getElementById('days').innerText=c; 
+            }, 40); 
+        }
+
+        // اللعبة
+        let sc=0;
+        function runGame() { sc=0; document.getElementById('st-game').style.display='none'; spawn(); let tm=15; let ti=setInterval(()=>{ tm--; document.getElementById('score').innerText=sc; if(tm<=0||sc>=8){ clearInterval(ti); if(sc>=8){ confetti(); document.getElementById('btn-s4').style.display='block'; } else { document.getElementById('st-game').style.display='block'; } } },1000); }
+        function spawn() { if(sc>=8) return; const box=document.getElementById('game-box'); const h=document.createElement('div'); h.innerHTML="💖"; h.className="shiny-heart"; h.style.left=Math.random()*(box.offsetWidth-50)+"px"; h.style.top=Math.random()*(box.offsetHeight-50)+"px"; h.onmousedown=()=>{ sc++; h.remove(); spawn(); }; box.appendChild(h); }
+
+        const imgs = ["photo_7_2025-12-27_20-08-15.jpg","photo_8_2025-12-27_20-08-15.jpg","photo_1_2025-12-27_20-08-15.jpg","photo_2_2025-12-27_20-08-15.jpg","photo_4_2025-12-27_20-08-15.jpg","photo_5_2025-12-27_20-08-15.jpg","photo_6_2025-12-27_20-08-15.jpg"];
+        let idx=0; function nextImg() { idx=(idx+1)%imgs.length; document.getElementById('gal-img').src=imgs[idx]; }
+
+        function openLetter() {
+            document.getElementById('letter-modal').style.display='flex';
+            const msg = "My Dearest,\n\nThese 194 days have been the most honorable journey of my life. As we step into 2026, I promise to protect your happiness like a true Samurai protects his honor.\n\nLove, nooreldean.";
+            let i=0; const el = document.getElementById('typewriter'); el.innerHTML = "";
+            function type() { if(i < msg.length) { el.innerHTML += msg.charAt(i)==="\n"?"<br>":msg.charAt(i); i++; setTimeout(type, 45); } else { document.getElementById('final-btn').style.display='block'; } }
+            type();
+        }
+
+        function goToLovePage() { document.getElementById('letter-modal').style.display='none'; showS('s6'); }
+
+        // زر الهروب الثابت
+        const noBtn = document.getElementById("no-btn");
+        const boundary = document.getElementById("love-boundary");
+        function moveNo() {
+            const maxX = boundary.offsetWidth - noBtn.offsetWidth;
+            const maxY = boundary.offsetHeight - noBtn.offsetHeight;
+            noBtn.style.left = Math.random() * maxX + "px";
+            noBtn.style.top = Math.random() * maxY + "px";
+        }
+        noBtn.addEventListener("mouseover", moveNo);
+        noBtn.addEventListener("touchstart", (e) => { e.preventDefault(); moveNo(); });
+
+        function handleYes() {
+            document.getElementById('love-boundary').style.display = 'none';
+            document.querySelector('.tenor-gif-embed').style.display = 'none';
+            document.getElementById('love-l').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('love-l').style.display = 'none';
+                document.getElementById('love-res').style.display = 'block';
+                document.getElementById('v-res').play();
+                confetti({ particleCount: 200, spread: 100 });
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
